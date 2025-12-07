@@ -14,12 +14,15 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const users = {};
+
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
+
   socket.on('userJoined', (data) => {
     users[socket.id] = { name: data.name, socketId: socket.id };
     io.emit('onlineUsers', users);
   });
+
   socket.on('message', (data) => {
     const user = users[socket.id];
     if (user) {
@@ -31,6 +34,7 @@ io.on('connection', (socket) => {
       });
     }
   });
+
   socket.on('disconnect', () => {
     delete users[socket.id];
     io.emit('onlineUsers', users);
@@ -40,5 +44,4 @@ io.on('connection', (socket) => {
 const PORT = 3000;
 server.listen(PORT, () => {
   console.log('Server running on port 3000');
-  });
 });
